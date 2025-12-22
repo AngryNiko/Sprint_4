@@ -1,10 +1,12 @@
 package tests;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.openqa.selenium.WebDriver;
+import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import pageobject.MainPage;
@@ -13,10 +15,14 @@ import pageobject.OrderPage;
 import java.util.Arrays;
 import java.util.Collection;
 
+import static org.junit.Assert.assertTrue;
+
 @RunWith(Parameterized.class)
 public class OrderTest {
 
     private WebDriver driver;
+    private MainPage mainPage;
+    private OrderPage orderPage;
 
     private final boolean useTopButton;
     private final String name;
@@ -29,7 +35,7 @@ public class OrderTest {
     private final boolean black;
     private final boolean grey;
 
-    public OrderTest(boolean useTopButton, String name, String surname, String address,String metro, String phone, String date, String rentPeriod, boolean black, boolean grey) {
+    public OrderTest(boolean useTopButton, String name, String surname, String address, String metro, String phone, String date, String rentPeriod, boolean black, boolean grey) {
         this.useTopButton = useTopButton;
         this.name = name;
         this.surname = surname;
@@ -50,31 +56,25 @@ public class OrderTest {
         });
     }
 
-    @Test
-    public void orderTestChrome() {
-        driver = new ChromeDriver();
-        driver.get("https://qa-scooter.praktikum-services.ru/");
+    @Before
+    public void setUp() {
+        String browser = System.getProperty("browser", "chrome");
 
-        MainPage mainPage = new MainPage(driver);
-        OrderPage orderPage = new OrderPage(driver);
-
-        if (useTopButton) {
-            mainPage.clickTopOrderButton();
-        } else {
-            mainPage.clickBottomOrderButton();
+        if (browser.equals("chrome")) {
+            WebDriverManager.chromedriver().setup();
+            driver = new ChromeDriver();
+        } else if (browser.equals("firefox")) {
+            WebDriverManager.firefoxdriver().setup();
+            driver = new FirefoxDriver();
         }
 
-        orderPage.fillFirstForm(name, surname, address, metro, phone);
-        orderPage.fillSecondForm(date, rentPeriod, black, grey);
+        driver.get("https://qa-scooter.praktikum-services.ru/");
+        mainPage = new MainPage(driver);
+        orderPage = new OrderPage(driver);
     }
 
     @Test
-    public void orderTestFirefox() {
-        driver = new FirefoxDriver();
-        driver.get("https://qa-scooter.praktikum-services.ru/");
-
-        MainPage mainPage = new MainPage(driver);
-        OrderPage orderPage = new OrderPage(driver);
+    public void orderTest() {
 
         if (useTopButton) {
             mainPage.clickTopOrderButton();
@@ -84,6 +84,7 @@ public class OrderTest {
 
         orderPage.fillFirstForm(name, surname, address, metro, phone);
         orderPage.fillSecondForm(date, rentPeriod, black, grey);
+        assertTrue("Окно успешного заказа не отображается", orderPage.isOrderSuccessDisplayed());
     }
 
     @After

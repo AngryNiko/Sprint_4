@@ -63,4 +63,10 @@ public class OrderPage {
         wait.until(ExpectedConditions.elementToBeClickable(orderButton)).click();
         wait.until(ExpectedConditions.elementToBeClickable(confirmYes)).click();
     }
+    //Появление окна оформленного заказа
+    private final By orderSuccessHeader = By.xpath(".//div[contains(text(),'Заказ оформлен')]");
+
+    public boolean isOrderSuccessDisplayed() {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(orderSuccessHeader)).isDisplayed();
+    }
 }

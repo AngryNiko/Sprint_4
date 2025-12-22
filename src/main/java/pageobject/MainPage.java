@@ -11,9 +11,15 @@ public class MainPage {
     private final WebDriver driver;
     private final WebDriverWait wait;
 
+    public static final String URL = "https://qa-scooter.praktikum-services.ru/";
+
     public MainPage(WebDriver driver) {
         this.driver = driver;
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+    }
+
+    public void open() {
+        driver.get(URL);
     }
 
     // Верхняя кнопка «Заказать»
@@ -50,8 +56,6 @@ public class MainPage {
     }
     // Получить ответы о важном
     public String getAnswerText(int index) {
-        return wait.until(
-                ExpectedConditions.visibilityOfElementLocated(answerPanel(index))
-        ).getText();
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(answerPanel(index))).getText();
     }
 }
